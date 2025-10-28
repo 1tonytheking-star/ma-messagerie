@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Messagerie</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="users"></div>
-  <div id="chat">
-    <div id="messages"></div>
-    <input id="messageInput" placeholder="Votre message..." />
-    <button onclick="sendMessage()">Envoyer</button>
+  <div id="chat-container">
+    <div id="user-list">
+      <h3>Utilisateurs</h3>
+      <ul id="users"></ul>
+    </div>
+    <div id="chat-box">
+      <div id="messages"></div>
+      <form id="messageForm">
+        <input id="messageInput" autocomplete="off" placeholder="Votre message...">
+        <button>Envoyer</button>
+      </form>
+    </div>
   </div>
-
   <script src="/socket.io/socket.io.js"></script>
   <script src="script.js"></script>
 </body>
