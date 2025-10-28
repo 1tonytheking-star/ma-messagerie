@@ -1,14 +1,15 @@
-document.getElementById("loginBtn").addEventListener("click", () => {
-  const prenom = document.getElementById("prenom").value.trim();
-  const nom = document.getElementById("nom").value.trim();
+const socket = io();
+
+document.getElementById("login-btn").addEventListener("click", () => {
+  const name = document.getElementById("name").value.trim();
+  const surname = document.getElementById("surname").value.trim();
   const code = document.getElementById("code").value.trim();
 
-  if (!prenom || !nom || !code) {
-    alert("Merci de remplir tous les champs !");
-    return;
+  if (name && surname && code) {
+    localStorage.setItem("user", JSON.stringify({ name, surname, code }));
+    socket.emit("login", { name, surname, code });
+    window.location.href = "chat.html";
+  } else {
+    alert("Remplis tous les champs !");
   }
-
-  const user = { prenom, nom, code };
-  localStorage.setItem("user", JSON.stringify(user));
-  window.location.href = "index.html";
 });
