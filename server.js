@@ -8,25 +8,29 @@ app.use(express.static(__dirname));
 let users = [];
 
 io.on("connection", (socket) => {
-  socket.on("newUser", (user) => {
-    user.socketId = socket.id;
-    user.online = true;
-    users.push(user);
-    io.emit("userList", users);
+  console.log("Nouvelle connexion");
+
+  socket.on("login", (user) => {
+    const existing = users.find(u => u.nom === user.nom && u.prenom === user.prenom && u.code === user.code);
+    if (existing) {
+      existing.online = true;
+      existing.id = socket.id;
+    } else {
+      users.push({ ...user, id: socket.id, online: true });
+    }
+    io.emit("updateUsers", users);
   });
 
   socket.on("disconnect", () => {
-    users = users.map(u => (u.socketId === socket.id ? { ...u, online: false } : u));
-    io.emit("userList", users);
+    const user = users.find(u => u.id === socket.id);
+    if (user) user.online = false;
+    io.emit("updateUsers", users);
   });
 
-  socket.on("privateMessage", (data) => {
-    const target = users.find(u => u.code === data.to);
-    if (target && target.socketId) {
-      io.to(target.socketId).emit("message", data);
-    }
+  socket.on("sendMessage", (msg) => {
+    io.emit("receiveMessage", msg);
   });
 });
 
 const PORT = process.env.PORT || 3000;
-http.listen(PORT, () => console.log(`✅ Serveur en ligne sur le port ${PORT}`));
+http.listen(PORT, () => console.log(`Serveur en ligne sur le port ${PORT}`));
