@@ -1,45 +1,43 @@
 const socket = io();
-const user = JSON.parse(localStorage.getItem("user"));
-if (!user) window.location.href = "login.html";
+let currentUser = JSON.parse(localStorage.getItem("user"));
 
-socket.emit("newUser", user);
+function login() {
+  const user = {
+    prenom: document.getElementById("prenom").value,
+    nom: document.getElementById("nom").value,
+    code: document.getElementById("code").value
+  };
 
-const userListDiv = document.getElementById("userList");
-const messagesDiv = document.getElementById("messages");
-const messageInput = document.getElementById("messageInput");
-const sendBtn = document.getElementById("sendBtn");
+  localStorage.setItem("user", JSON.stringify(user));
+  socket.emit("login", user);
+  window.location.href = "chat.html";
+}
 
-let selectedUser = null;
+if (window.location.pathname.endsWith("chat.html")) {
+  if (!currentUser) window.location.href = "index.html";
 
-socket.on("userList", (users) => {
-  userListDiv.innerHTML = "";
-  users.forEach(u => {
-    const div = document.createElement("div");
-    div.textContent = `${u.prenom} ${u.nom}` + (u.online ? " 🟢" : " 🔴");
-    div.addEventListener("click", () => {
-      selectedUser = u;
-      messagesDiv.innerHTML = `<p>Chat avec ${u.prenom} ${u.nom}</p>`;
+  socket.emit("login", currentUser);
+
+  socket.on("updateUsers", (users) => {
+    const usersDiv = document.getElementById("users");
+    usersDiv.innerHTML = "";
+    users.forEach(u => {
+      const div = document.createElement("div");
+      div.innerHTML = `${u.prenom} ${u.nom} <span style="color:${u.online ? 'green' : 'red'};">●</span>`;
+      usersDiv.appendChild(div);
     });
-    userListDiv.appendChild(div);
   });
-});
 
-socket.on("message", (data) => {
-  if (!selectedUser || data.from !== selectedUser.code) return;
-  const p = document.createElement("p");
-  p.textContent = `${data.sender}: ${data.message}`;
-  messagesDiv.appendChild(p);
-});
+  socket.on("receiveMessage", (msg) => {
+    const messagesDiv = document.getElementById("messages");
+    const div = document.createElement("div");
+    div.textContent = `${msg.from}: ${msg.text}`;
+    messagesDiv.appendChild(div);
+  });
+}
 
-sendBtn.addEventListener("click", () => {
-  const msg = messageInput.value.trim();
-  if (msg && selectedUser) {
-    socket.emit("privateMessage", {
-      from: user.code,
-      to: selectedUser.code,
-      sender: `${user.prenom} ${user.nom}`,
-      message: msg
-    });
-    messageInput.value = "";
-  }
-});
+function sendMessage() {
+  const text = document.getElementById("messageInput").value;
+  socket.emit("sendMessage", { from: currentUser.prenom, text });
+  document.getElementById("messageInput").value = "";
+}
