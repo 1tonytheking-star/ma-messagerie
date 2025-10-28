@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ma Messagerie</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Bienvenue dans Ma Messagerie</h1>
+    
+    <div id="chat">
+        <ul id="messages"></ul>
+    </div>
+
+    <form id="messageForm">
+        <input id="messageInput" type="text" placeholder="Écris un message..." autocomplete="off"/>
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
