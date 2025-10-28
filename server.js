@@ -1,30 +1,32 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-
+const express = require("express");
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
 
-// Servir les fichiers statiques (HTML, CSS, JS)
 app.use(express.static(__dirname));
 
-// Quand un client se connecte
-io.on('connection', (socket) => {
-    console.log('Un utilisateur est connecté');
+let users = [];
 
-    // Quand un message est reçu, on le renvoie à tous
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
-    });
+io.on("connection", (socket) => {
+  socket.on("newUser", (user) => {
+    user.socketId = socket.id;
+    user.online = true;
+    users.push(user);
+    io.emit("userList", users);
+  });
 
-    socket.on('disconnect', () => {
-        console.log('Un utilisateur est déconnecté');
-    });
+  socket.on("disconnect", () => {
+    users = users.map(u => (u.socketId === socket.id ? { ...u, online: false } : u));
+    io.emit("userList", users);
+  });
+
+  socket.on("privateMessage", (data) => {
+    const target = users.find(u => u.code === data.to);
+    if (target && target.socketId) {
+      io.to(target.socketId).emit("message", data);
+    }
+  });
 });
 
-// Lancer le serveur
-const PORT = 3000;
-server.listen(PORT, () => {
-    console.log(`Serveur lancé sur http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, () => console.log(`✅ Serveur en ligne sur le port ${PORT}`));
