@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Connexion - Messagerie</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Connexion</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="login-container">
-    <h1>Connexion</h1>
-    <input type="text" id="prenom" placeholder="Prénom" required>
-    <input type="text" id="nom" placeholder="Nom" required>
-    <input type="password" id="code" placeholder="Code" required>
-    <button id="loginBtn">Se connecter</button>
+  <div id="login-container">
+    <h2>Connexion</h2>
+    <input id="name" placeholder="Prénom" />
+    <input id="surname" placeholder="Nom" />
+    <input id="code" placeholder="Code secret" />
+    <button id="login-btn">Entrer</button>
   </div>
-
+  <script src="/socket.io/socket.io.js"></script>
   <script src="login.js"></script>
 </body>
 </html>
